@@ -1,6 +1,7 @@
 package internal
 
 type Commit struct{
+	fullCommit string
 	branch string
 	types string
 	porte string
@@ -8,4 +9,5 @@ type Commit struct{
 	description string
 	footer string
 	isValidCommit bool
+	score int
 }
