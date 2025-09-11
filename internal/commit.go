@@ -7,4 +7,5 @@ type Commit struct{
 	sujet string
 	description string
 	footer string
+	isValidCommit bool
 }

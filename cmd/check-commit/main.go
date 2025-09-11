@@ -1,10 +1,14 @@
 package main
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/Rakotoarilala51/akata-commit-checker/internal"
+	"github.com/spf13/cobra"
+)
 
 var rootCmd *cobra.Command;
 
 func main(){
+	internal.GetCommitList()
 	rootCmd.Execute();
 }
 
