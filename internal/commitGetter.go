@@ -31,10 +31,10 @@ func GetCommitList() []Commit{
 		message := c.Message
 		commitMessage := strings.Split(message, "\n")
 		validateMainCommit(commitMessage[0], &commit)
-		commitList = append(commitList, commit)
 		if len(commitMessage)>1{
 			commit.description = strings.Join(commitMessage[1:], "\n") 
 		}
+		commitList = append(commitList, commit)
 		return nil
 	})
 	if err != nil {
