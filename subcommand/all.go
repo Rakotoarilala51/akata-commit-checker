@@ -6,7 +6,7 @@ import (
 )
 
 var AllCmd = &cobra.Command{
-	Use: "a",
+	Use: "all",
 	Short: "Evaluation de tous les commits dans tous les branches",
 	Run: func(cmd *cobra.Command, args []string) {
 		internal.GetCommitList()
