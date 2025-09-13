@@ -1,11 +1,7 @@
 package internal
 
 import (
-	"fmt"
 	"log"
-	"regexp"
-	"strings"
-
 	git "github.com/go-git/go-git/v6"
 	"github.com/go-git/go-git/v6/plumbing/object")
 
@@ -13,9 +9,6 @@ import (
 func GetCommitList() []Commit{
 	gitCommitList := getGitCommitList()
 	commitList := convertToCustomCommit(gitCommitList)
-	for _, c:= range commitList{
-		fmt.Printf("%+v\n", c)
-	}
 	return commitList
 }
 
@@ -42,35 +35,14 @@ func getGitCommitList()[]*object.Commit{
 	}
 	return gitCommits
 }
-func convertToCustomCommit(gitCommits []*object.Commit) []Commit{
+func convertToCustomCommit(gitCommits []*object.Commit) []Commit {
 	customCommitList := []Commit{}
-	for _, gitCommit := range gitCommits{
+	for _, gitCommit := range gitCommits {
 		var commit Commit
-		commit.fullCommit = gitCommit.Message
-		commitMessage := strings.Split(commit.fullCommit, "\n");
-		validateMainCommit(commitMessage[0], &commit)
-		if len(commitMessage)>1{
-			commit.description = strings.Join(commitMessage[1:], "\n") 
-		}
+		commit.ParseBodyAndFooter(gitCommit.Message)
+		commit.ParseHeader(gitCommit.Message)
 		customCommitList = append(customCommitList, commit)
 	}
 	return customCommitList
+}
 
-}
-func validateMainCommit(message string, commit *Commit){
-	validTypes := []string{
-		"build", "ci", "docs", "feat", "fix", "perf", "refactor", "style", "test",
-	}
-	
-	typePattern := fmt.Sprintf("(%s)", strings.Join(validTypes, "|"))
-	regexPattern := fmt.Sprintf("^%s(?:\\(([^)]+)\\))?\\s*:\\s*(.+)$", typePattern)
-	regex := regexp.MustCompile(regexPattern)
-	
-	matches := regex.FindStringSubmatch(message)
-	commit.isValidCommit = matches!=nil
-	if commit.isValidCommit{
-		commit.types=matches[1]
-		commit.porte=matches[2]
-		commit.sujet=matches[3]
-	}
-}
