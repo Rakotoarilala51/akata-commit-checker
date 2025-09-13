@@ -17,4 +17,5 @@ func init(){
 		Short: "Outils d'évaluation de qualité de message de commit (selon la convention de commit d'AKATA GOAVANA) dans un dépot git \nHO GOAVANA HATRANY",
 	}
 	rootCmd.AddCommand(subcommand.AllCmd)
+	rootCmd.AddCommand(subcommand.BranchCmd)
 }
