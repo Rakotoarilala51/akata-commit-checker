@@ -40,10 +40,11 @@ func (c *Commit) ParseBodyAndFooter(message string) {
 func (commit *Commit) ParseHeader(message string){
 	validTypes := []string{
 		"build", "ci", "docs", "feat", "fix", "perf", "refactor", "style", "test",
-	}	
+	}
+	
 	typePattern := fmt.Sprintf("(%s)", strings.Join(validTypes, "|"))
 	regexPattern := fmt.Sprintf("^%s(?:\\(([^)]+)\\))?\\s*:\\s*(.+)$", typePattern)
-	regex := regexp.MustCompile(regexPattern)	
+	regex := regexp.MustCompile(regexPattern)
 	matches := regex.FindStringSubmatch(message)
 	commit.isValidCommit = matches!=nil
 	if commit.isValidCommit{
@@ -71,4 +72,77 @@ func (c *Commit) CalculateQualityScore() {
 		score = 5
 	}
 	c.score = score
+}
+func (c *Commit) DisplayQualityReport() {
+	fmt.Printf("=== RAPPORT DE QUALITÉ DU COMMIT ===\n")
+	fmt.Printf("Sujet: %s\n", c.sujet)
+	fmt.Printf("Score: %d/5\n", c.score)
+
+	switch c.score {
+	case 0:
+		fmt.Printf("❌ COMMIT INVALIDE\n")
+		fmt.Printf("   - Format incorrect (doit respecter: <type>(<portée>): <sujet>)\n")
+		fmt.Printf("   - Types valides: build, ci, docs, feat, fix, perf, refactor, style, test\n")
+		
+	case 3:
+		fmt.Printf("✅ COMMIT VALIDE - BASIQUE\n")
+		fmt.Printf("   ✓ Type: %s\n", c.types)
+		fmt.Printf("   ✓ Sujet: présent\n")
+		
+		missing := []string{}
+		if strings.TrimSpace(c.porte) == "" {
+			missing = append(missing, "portée (scope)")
+		}
+		if strings.TrimSpace(c.description) == "" {
+			missing = append(missing, "description")
+		}
+		if strings.TrimSpace(c.footer) == "" {
+			missing = append(missing, "footer")
+		}
+		
+		if len(missing) > 0 {
+			fmt.Printf("⚠️  AMÉLIORATIONS POSSIBLES:\n")
+			for _, item := range missing {
+				fmt.Printf("   - Ajouter %s\n", item)
+			}
+		}
+		
+	case 4:
+		fmt.Printf("✅ BON COMMIT\n")
+		fmt.Printf("   ✓ Type: %s\n", c.types)
+		fmt.Printf("   ✓ Sujet: présent\n")
+		
+		if strings.TrimSpace(c.porte) != "" {
+			fmt.Printf("   ✓ Portée: %s\n", c.porte)
+		} else {
+			fmt.Printf("   - Portée: manquante\n")
+		}
+		
+		if strings.TrimSpace(c.description) != "" {
+			fmt.Printf("   ✓ Description: présente\n")
+		} else {
+			fmt.Printf("   - Description: manquante\n")
+		}
+		
+		if strings.TrimSpace(c.footer) != "" {
+			fmt.Printf("   ✓ Footer: présent\n")
+		} else {
+			fmt.Printf("   - Footer: manquant\n")
+		}
+		
+	case 5:
+		fmt.Printf("🌟 EXCELLENT COMMIT\n")
+		fmt.Printf("   ✓ Type: %s\n", c.types)
+		fmt.Printf("   ✓ Sujet: présent\n")
+		fmt.Printf("   ✓ Portée: %s\n", c.porte)
+		fmt.Printf("   ✓ Description: présente\n")
+		
+		if strings.TrimSpace(c.footer) != "" {
+			fmt.Printf("   ✓ Footer: présent\n")
+		}
+		
+		fmt.Printf("   🎉 Respect parfait des conventions Git!\n")
+	}
+	
+	fmt.Printf("=====================================\n\n")
 }

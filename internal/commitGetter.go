@@ -2,14 +2,19 @@ package internal
 
 import (
 	"log"
+	"strings"
+
 	git "github.com/go-git/go-git/v6"
-	"github.com/go-git/go-git/v6/plumbing/object")
+	"github.com/go-git/go-git/v6/plumbing/object"
+)
 
 
-func GetCommitList() []Commit{
+func GetCommitList() {
 	gitCommitList := getGitCommitList()
 	commitList := convertToCustomCommit(gitCommitList)
-	return commitList
+	for _, commit := range commitList{
+		commit.DisplayQualityReport()
+	}
 }
 
 func getGitCommitList()[]*object.Commit{
@@ -35,12 +40,15 @@ func getGitCommitList()[]*object.Commit{
 	}
 	return gitCommits
 }
+
 func convertToCustomCommit(gitCommits []*object.Commit) []Commit {
 	customCommitList := []Commit{}
 	for _, gitCommit := range gitCommits {
 		var commit Commit
+		firstLine := strings.Split(gitCommit.Message, "\n")[0]
+		commit.ParseHeader(firstLine)
 		commit.ParseBodyAndFooter(gitCommit.Message)
-		commit.ParseHeader(gitCommit.Message)
+		commit.CalculateQualityScore()
 		customCommitList = append(customCommitList, commit)
 	}
 	return customCommitList
