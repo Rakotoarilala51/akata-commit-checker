@@ -11,39 +11,51 @@ import (
 
 
 func GetCommitList() []Commit{
-	repo, err := git.PlainOpen(".")
-	commitList := []Commit{}
-	if err != nil{
-		log.Fatalln(err)
-	}
-	ref, err := repo.Head()
-	if err != nil{
-		log.Fatal(err)
-	}
-
-	iter, err := repo.Log(&git.LogOptions{From: ref.Hash()})
-	if err != nil {
-		log.Fatal(err)
-	}
-	
-	err = iter.ForEach(func(c *object.Commit) error {
-		var commit Commit;
-		message := c.Message
-		commitMessage := strings.Split(message, "\n")
-		validateMainCommit(commitMessage[0], &commit)
-		if len(commitMessage)>1{
-			commit.description = strings.Join(commitMessage[1:], "\n") 
-		}
-		commitList = append(commitList, commit)
-		return nil
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
+	gitCommitList := getGitCommitList()
+	commitList := convertToCustomCommit(gitCommitList)
 	for _, c:= range commitList{
 		fmt.Printf("%+v\n", c)
 	}
 	return commitList
+}
+
+func getGitCommitList()[]*object.Commit{
+	repo, err := git.PlainOpen(".")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	ref, err := repo.Head()
+	if err != nil{
+		log.Fatalln(err)
+	}
+	iter, err := repo.Log(&git.LogOptions{From: ref.Hash()})
+	if err != nil{
+		log.Fatalln(err)
+	}
+	gitCommits := []*object.Commit{}
+	err = iter.ForEach(func(c *object.Commit) error {
+		gitCommits = append(gitCommits, c)
+		return nil
+	})
+	if err != nil{
+		log.Fatalln(err)
+	}
+	return gitCommits
+}
+func convertToCustomCommit(gitCommits []*object.Commit) []Commit{
+	customCommitList := []Commit{}
+	for _, gitCommit := range gitCommits{
+		var commit Commit
+		commit.fullCommit = gitCommit.Message
+		commitMessage := strings.Split(commit.fullCommit, "\n");
+		validateMainCommit(commitMessage[0], &commit)
+		if len(commitMessage)>1{
+			commit.description = strings.Join(commitMessage[1:], "\n") 
+		}
+		customCommitList = append(customCommitList, commit)
+	}
+	return customCommitList
+
 }
 func validateMainCommit(message string, commit *Commit){
 	validTypes := []string{
