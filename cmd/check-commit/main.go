@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/Rakotoarilala51/akata-commit-checker/subcommand"
 	"github.com/spf13/cobra"
 )
@@ -8,7 +10,9 @@ import (
 var rootCmd *cobra.Command;
 
 func main(){
-	rootCmd.Execute();
+	if err:=rootCmd.Execute(); err != nil{
+		os.Exit(1)
+	}
 }
 
 func init(){

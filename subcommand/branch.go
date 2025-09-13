@@ -11,9 +11,11 @@ var BranchCmd = &cobra.Command{
 	Use: "branch",
 	Short: "Evaluation de tous les commits dans un branche spécifiquse",
 	Run: func(cmd *cobra.Command, args []string) {
-		if args[0] == ""{
+		if len(args)<=0{
 			log.Fatalln("vous devrais ajouter le nom de Branche")
+		}else{
+			internal.GetCommitListOfBranch(args[0])
 		}
-		internal.GetCommitListOfBranch(args[0])
+		
 	},
 }
