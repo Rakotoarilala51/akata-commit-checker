@@ -52,3 +52,23 @@ func (commit *Commit) ParseHeader(message string){
 		commit.sujet=matches[3]
 	}
 }
+func (c *Commit) CalculateQualityScore() {
+	if !c.isValidCommit {
+		c.score = 0
+		return
+	}
+	score := 3
+	if strings.TrimSpace(c.porte) != "" {
+		score++
+	}
+	if strings.TrimSpace(c.description) != "" {
+		score++
+	}
+	if strings.TrimSpace(c.footer) != "" && score < 5 {
+		score++
+	}
+	if score > 5 {
+		score = 5
+	}
+	c.score = score
+}
