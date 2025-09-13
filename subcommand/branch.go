@@ -1,21 +1,25 @@
 package subcommand
 
 import (
-	"log"
-
+	"fmt"
+	"os"
+	
 	"github.com/Rakotoarilala51/akata-commit-checker/internal"
 	"github.com/spf13/cobra"
 )
 
 var BranchCmd = &cobra.Command{
-	Use: "branch",
-	Short: "Evaluation de tous les commits dans un branche spécifiquse",
+	Use:   "branch <nom-branche>",
+	Short: "Evaluation de tous les commits dans une branche spécifique",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args)<=0{
-			log.Fatalln("vous devrais ajouter le nom de Branche")
-		}else{
-			internal.GetCommitListOfBranch(args[0])
+		branchName := args[0]
+		if branchName == "" {
+			fmt.Println("❌ Erreur: Le nom de la branche ne peut pas être vide")
+			os.Exit(1)
 		}
 		
+		result := internal.GetCommitListOfBranchWithResult(branchName)
+		result.ExitWithCode() 
 	},
 }

@@ -9,6 +9,7 @@ var AllCmd = &cobra.Command{
 	Use: "all",
 	Short: "Evaluation de tous les commits dans tous les branches",
 	Run: func(cmd *cobra.Command, args []string) {
-		internal.GetCommitList()
+		result := internal.GetCommitListWithResult()
+		result.ExitWithCode()
 	},
 }
