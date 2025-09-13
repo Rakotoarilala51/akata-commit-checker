@@ -146,3 +146,8 @@ func (c *Commit) DisplayQualityReport() {
 	
 	fmt.Printf("=====================================\n\n")
 }
+func (ar *AnalysisResult) SetThreshold(threshold int) {
+    if threshold >= 1 && threshold <= 5 {
+        ar.QualityThreshold = threshold
+    }
+}
