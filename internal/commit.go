@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 type Commit struct{
@@ -74,24 +76,45 @@ func (c *Commit) CalculateQualityScore() {
 	c.score = score
 }
 func (c *Commit) DisplayQualityReport() {
-	fmt.Printf("=== RAPPORT DE QUALITÉ DU COMMIT ===\n")
-	fmt.Printf("Sujet: %s\n", c.sujet)
-	fmt.Printf("Score: %d/5\n", c.score)
+	// Définition des couleurs
+	red := color.New(color.FgRed)
+	green := color.New(color.FgGreen)
+	yellow := color.New(color.FgYellow)
+	//bold := color.New(color.Bold)
+	boldGreen := color.New(color.FgGreen, color.Bold)
+	
+	fmt.Printf("╔════════════════════════════════════════════════════════════╗\n")
+	fmt.Printf("║                    COMMIT QUALITY ANALYSIS                 ║\n")
+	fmt.Printf("╠════════════════════════════════════════════════════════════╣\n")
+	fmt.Printf("║                                                            ║\n")
+	fmt.Printf("║  Subject: %-47s ║\n", c.sujet)
+	fmt.Printf("║  Quality Score: %d/5                                      ║\n", c.score)
+	fmt.Printf("║                                                            ║\n")
+	fmt.Printf("╠════════════════════════════════════════════════════════════╣\n")
 
 	switch c.score {
 	case 0:
-		fmt.Printf("❌ COMMIT INVALIDE\n")
-		fmt.Printf("   - Format incorrect (doit respecter: <type>(<portée>): <sujet>)\n")
-		fmt.Printf("   - Types valides: build, ci, docs, feat, fix, perf, refactor, style, test\n")
-		
+		fmt.Printf("║  Status: ")
+		red.Printf("INVALID COMMIT FORMAT")
+		fmt.Printf("                          ║\n")
+		fmt.Printf("║                                                            ║\n")
+		fmt.Printf("║  CRITICAL ERRORS DETECTED:                                ║\n")
+		fmt.Printf("║  > Format violation: <type>(<scope>): <subject>           ║\n")
+		fmt.Printf("║  > Valid types: build, ci, docs, feat, fix, perf,         ║\n")
+		fmt.Printf("║                 refactor, style, test                     ║\n")
+
 	case 3:
-		fmt.Printf("✅ COMMIT VALIDE - BASIQUE\n")
-		fmt.Printf("   ✓ Type: %s\n", c.types)
-		fmt.Printf("   ✓ Sujet: présent\n")
+		fmt.Printf("║  Status: ")
+		yellow.Printf("BASIC VALID COMMIT")
+		fmt.Printf("                             ║\n")
+		fmt.Printf("║                                                            ║\n")
+		fmt.Printf("║  PRESENT ELEMENTS:                                        ║\n")
+		fmt.Printf("║  [+] Type: %-47s ║\n", c.types)
+		fmt.Printf("║  [+] Subject: present                                      ║\n")
 		
 		missing := []string{}
 		if strings.TrimSpace(c.porte) == "" {
-			missing = append(missing, "portée (scope)")
+			missing = append(missing, "scope")
 		}
 		if strings.TrimSpace(c.description) == "" {
 			missing = append(missing, "description")
@@ -101,51 +124,65 @@ func (c *Commit) DisplayQualityReport() {
 		}
 		
 		if len(missing) > 0 {
-			fmt.Printf("⚠️  AMÉLIORATIONS POSSIBLES:\n")
+			fmt.Printf("║                                                            ║\n")
+			fmt.Printf("║  OPTIMIZATION OPPORTUNITIES:                              ║\n")
 			for _, item := range missing {
-				fmt.Printf("   - Ajouter %s\n", item)
+				fmt.Printf("║  [-] Missing: %-43s ║\n", item)
 			}
 		}
-		
+
 	case 4:
-		fmt.Printf("✅ BON COMMIT\n")
-		fmt.Printf("   ✓ Type: %s\n", c.types)
-		fmt.Printf("   ✓ Sujet: présent\n")
+		fmt.Printf("║  Status: ")
+		green.Printf("GOOD COMMIT QUALITY")
+		fmt.Printf("                            ║\n")
+		fmt.Printf("║                                                            ║\n")
+		fmt.Printf("║  ELEMENT ANALYSIS:                                        ║\n")
+		fmt.Printf("║  [+] Type: %-47s ║\n", c.types)
+		fmt.Printf("║  [+] Subject: present                                      ║\n")
 		
 		if strings.TrimSpace(c.porte) != "" {
-			fmt.Printf("   ✓ Portée: %s\n", c.porte)
+			fmt.Printf("║  [+] Scope: %-46s ║\n", c.porte)
 		} else {
-			fmt.Printf("   - Portée: manquante\n")
+			fmt.Printf("║  [-] Scope: missing                                        ║\n")
 		}
 		
 		if strings.TrimSpace(c.description) != "" {
-			fmt.Printf("   ✓ Description: présente\n")
+			fmt.Printf("║  [+] Description: present                                  ║\n")
 		} else {
-			fmt.Printf("   - Description: manquante\n")
+			fmt.Printf("║  [-] Description: missing                                  ║\n")
 		}
 		
 		if strings.TrimSpace(c.footer) != "" {
-			fmt.Printf("   ✓ Footer: présent\n")
+			fmt.Printf("║  [+] Footer: present                                       ║\n")
 		} else {
-			fmt.Printf("   - Footer: manquant\n")
+			fmt.Printf("║  [-] Footer: missing                                       ║\n")
 		}
-		
+
 	case 5:
-		fmt.Printf("🌟 EXCELLENT COMMIT\n")
-		fmt.Printf("   ✓ Type: %s\n", c.types)
-		fmt.Printf("   ✓ Sujet: présent\n")
-		fmt.Printf("   ✓ Portée: %s\n", c.porte)
-		fmt.Printf("   ✓ Description: présente\n")
-		
+		fmt.Printf("║  Status: ")
+		boldGreen.Printf("EXCELLENT COMMIT QUALITY")
+		fmt.Printf("                       ║\n")
+		fmt.Printf("║                                                            ║\n")
+		fmt.Printf("║  PERFECT COMPLIANCE ACHIEVED:                             ║\n")
+		fmt.Printf("║  [+] Type: %-47s ║\n", c.types)
+		fmt.Printf("║  [+] Subject: present                                      ║\n")
+		fmt.Printf("║  [+] Scope: %-46s ║\n", c.porte)
+		fmt.Printf("║  [+] Description: present                                  ║\n")
 		if strings.TrimSpace(c.footer) != "" {
-			fmt.Printf("   ✓ Footer: présent\n")
+			fmt.Printf("║  [+] Footer: present                                       ║\n")
 		}
-		
-		fmt.Printf("   🎉 Respect parfait des conventions Git!\n")
+		fmt.Printf("║                                                            ║\n")
+		fmt.Printf("║  ")
+		green.Printf(">>> GIT CONVENTIONS: FULLY COMPLIANT <<<")
+		fmt.Printf("              ║\n")
 	}
 	
-	fmt.Printf("=====================================\n\n")
+	fmt.Printf("║                                                            ║\n")
+	fmt.Printf("╚════════════════════════════════════════════════════════════╝\n")
+	fmt.Printf("\n")
 }
+
+
 func (ar *AnalysisResult) SetThreshold(threshold int) {
     if threshold >= 1 && threshold <= 5 {
         ar.QualityThreshold = threshold

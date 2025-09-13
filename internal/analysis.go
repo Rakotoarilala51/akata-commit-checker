@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"os"
+	"github.com/fatih/color"
 )
 
 type AnalysisResult struct {
@@ -49,21 +50,69 @@ func (ar *AnalysisResult) CalculateGlobalScore() {
 }
 
 func (ar *AnalysisResult) DisplayGlobalReport() {
-	fmt.Printf("\n🔍 === RAPPORT GLOBAL D'ANALYSE ===\n")
-	fmt.Printf("📊 Commits analysés: %d\n", ar.TotalCommits)
-	fmt.Printf("✅ Commits valides: %d\n", ar.ValidCommits)
-	fmt.Printf("❌ Commits invalides: %d\n", ar.InvalidCommits)
-	fmt.Printf("📈 Score moyen: %.2f/5\n", ar.AverageScore)
-	fmt.Printf("🎯 Score global: %d/5\n", ar.GlobalScore)
+	fmt.Printf("\n")
 	
-	// Status global
+	green := color.New(color.FgGreen)
+	green.Println("> Initializing commit analysis...")
+	green.Println("> Scanning repository structure...")
+	green.Println("> Processing commit metadata...")
+	
+	fmt.Printf("\n")
+	fmt.Printf("╔══════════════════════════════════════════════════╗\n")
+	fmt.Printf("║                COMMIT ANALYSIS RESULTS           ║\n")
+	fmt.Printf("╠══════════════════════════════════════════════════╣\n")
+	fmt.Printf("║                                                  ║\n")
+	
+	// Les couleurs n'affectent plus l'alignement !
+	yellow := color.New(color.FgYellow)
+	greenColor := color.New(color.FgGreen)
+	red := color.New(color.FgRed)
+	cyan := color.New(color.FgCyan)
+	bold := color.New(color.Bold)
+	
+	fmt.Printf("║  Total commits............: ")
+	yellow.Printf("%04d", ar.TotalCommits)
+	fmt.Printf("                 ║\n")
+	
+	fmt.Printf("║  Valid commits............: ")
+	greenColor.Printf("%04d", ar.ValidCommits)
+	fmt.Printf("                 ║\n")
+	
+	fmt.Printf("║  Invalid commits..........: ")
+	red.Printf("%04d", ar.InvalidCommits)
+	fmt.Printf("                 ║\n")
+	
+	fmt.Printf("║  Average quality..........: ")
+	cyan.Printf("%.2f/5", ar.AverageScore)
+	fmt.Printf("               ║\n")
+	
+	fmt.Printf("║  Repository score.........: ")
+	bold.Printf("%d/5", ar.GlobalScore)
+	fmt.Printf("                  ║\n")
+	
+	fmt.Printf("║                                                  ║\n")
+	
 	if ar.GlobalScore >= ar.QualityThreshold {
-		fmt.Printf("✅ QUALITÉ ACCEPTABLE (seuil: %d/5)\n", ar.QualityThreshold)
+		fmt.Printf("║  Status: [")
+		greenColor.Printf(" PASS ")
+		fmt.Printf("] Quality threshold met          ║\n")
+		
+		fmt.Printf("║  Required threshold.......: ")
+		greenColor.Printf("%d/5", ar.QualityThreshold)
+		fmt.Printf("                  ║\n")
 	} else {
-		fmt.Printf("❌ QUALITÉ INSUFFISANTE (seuil: %d/5)\n", ar.QualityThreshold)
+		fmt.Printf("║  Status: [")
+		red.Printf(" FAIL ")
+		fmt.Printf("] Quality below threshold   ║\n")
+		
+		fmt.Printf("║  Required threshold.......: ")
+		red.Printf("%d/5", ar.QualityThreshold)
+		fmt.Printf("               ║\n")
 	}
 	
-	fmt.Printf("=====================================\n\n")
+	fmt.Printf("║                                                  ║\n")
+	fmt.Printf("╚══════════════════════════════════════════════════╝\n")
+	fmt.Printf("\n")
 }
 
 func (ar *AnalysisResult) GetExitCode() int {
